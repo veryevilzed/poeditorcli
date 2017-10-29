@@ -4,6 +4,15 @@
 Using .json or .yaml files
 Only in Key-Value JSON files
 
+## Instalation
+
+```
+pip install -e git+https://github.com/veryevilzed/poeditorcli.git#egg=poeditorcli
+
+or
+
+pip install -e git+git://github.com/veryevilzed/poeditorcli.git#egg=poeditorcli
+```
 
 ## Update all language
 
