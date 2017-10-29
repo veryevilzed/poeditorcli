@@ -33,7 +33,7 @@ def upload(translation, api_token, project_id, language):
 @click.option('--project_id', default=None, help='POEditor Project ID')
 @click.option('--language', default=None, help='Language. if not set, load all languages. Need %s in translation name')
 @click.option('--except_language', default=None, help='Except language for `load all language`')
-def update(translation, api_token, project_id, language, exlang):
+def update(translation, api_token, project_id, language, except_language):
     if api_token is None:
         api_token = os.environ.get('POEDITOR_API_TOKEN')
     if language is None:
@@ -41,7 +41,7 @@ def update(translation, api_token, project_id, language, exlang):
             log.error("Need %s for language code")
             sys.exit(9)
 
-        POEditorUpdate.getLanguageList(translation, api_token, project_id, exlang)
+        POEditorUpdate.getLanguageList(translation, api_token, project_id, except_language)
     else:
         POEditorUpdate(translation, api_token, project_id, language)
 
