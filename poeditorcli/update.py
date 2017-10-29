@@ -34,7 +34,7 @@ class POEditorUpdate:
 
 
     @staticmethod
-    def getLanguageList(translation, api_token, project_id):
+    def getLanguageList(translation, api_token, project_id, exlang):
         payload = {
             "api_token": api_token,
             "id": project_id,
@@ -46,6 +46,8 @@ class POEditorUpdate:
             log.error(resp["response"]["message"])
             sys.exit(2)
         for lang in resp["result"]["languages"]:
+            if lang["code"] == exlang:
+                continue
             log.info("%(name)s(%(code)s) Translate:%(percentage)d%% LastUpdate:%(updated)s", lang)
             POEditorUpdate(translation % lang["code"], api_token, project_id, lang["code"])
 
