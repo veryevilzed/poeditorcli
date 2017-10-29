@@ -35,7 +35,7 @@ class POEditorUpload:
                 json.dump(data,  codecs.open("upload_me.json", 'w', "utf-8"), ensure_ascii=False)
                 self.data = json.dumps(data, ensure_ascii=False).encode("utf-8")
         else:
-            self.log.error("File %s not exist", (self.translation,))
+            log.error("File %s not exist", (self.translation,))
             sys.exit(2)
 
 
