@@ -7,12 +7,25 @@ Only in Key-Value JSON files
 ## Instalation
 
 ```
+New instalation:
 pip install -e git+https://github.com/veryevilzed/poeditorcli.git#egg=poeditorcli
 
 or
 
 pip install -e git+git://github.com/veryevilzed/poeditorcli.git#egg=poeditorcli
+
+
+Upgrade:
+pip install -U -e git+https://github.com/veryevilzed/poeditorcli.git#egg=poeditorcli
+
+or
+
+pip install -U -e git+git://github.com/veryevilzed/poeditorcli.git#egg=poeditorcli
+
 ```
+
+
+
 
 ## Update all language
 
