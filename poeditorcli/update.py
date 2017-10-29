@@ -19,7 +19,7 @@ class POEditorUpdate:
         self.language = language
         self.download()
 
-        if self.translation.endswith(".yml") or self.translation.endswith(".yaml"):
+        if self.translation.endswith(".yml") or self.translation.endswith(".yaml") or self.translation.endswith(".yml.txt"):
             log.info("Save yaml")
             with codecs.open(self.translation, 'w', "utf-8") as f:
                 yaml.safe_dump(self.data, f, default_flow_style=False, allow_unicode=True)

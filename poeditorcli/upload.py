@@ -15,7 +15,7 @@ class POEditorUpload:
         self.api_token = api_token
         self.project_id = project_id
         self.language = language
-        if self.translation.endswith(".yml") or self.translation.endswith(".yaml"):
+        if self.translation.endswith(".yml") or self.translation.endswith(".yaml") or self.translation.endswith(".yml.txt"):
             self.convert()
         elif self.translation.endswith(".json"):
             copyfile(translation, "upload_me.json")
