@@ -1,60 +1,113 @@
 #coding:utf-8
-import codecs
-
-import requests, yaml, json, sys, logging
-from requests_toolbelt import MultipartEncoder
+import codecs, requests, yaml, json, sys, os, logging
 from shutil import copyfile
-import os
+from StringIO import StringIO
+from utils import deepmerge, nested_get, multipart_post
 
 log = logging.getLogger("UPLOAD")
 
 class POEditorUpload:
-    def __init__(self, translation, api_token, project_id, language):
+    def __init__(self, translation, api_token, project_id, language, collect_path, force_delete):
         log.debug("file %s", translation)
         self.translation = translation
+        self.translation_name = os.path.basename(translation)
         self.api_token = api_token
         self.project_id = project_id
         self.language = language
-        if self.translation.endswith(".yml") or self.translation.endswith(".yaml") or self.translation.endswith(".yml.txt"):
-            self.convert()
-        elif self.translation.endswith(".json"):
-            copyfile(translation, "upload_me.json")
+        self.force_delete = force_delete
+        self.data = self.read(self.translation)
+        if collect_path is not None: 
+            self.collect(collect_path)
+        self.cleanup()
+        self.upload()
+
+    def read(self, name):
+        if not os.path.exists(name):
+            log.error("File %s not exist", (name,))
+            sys.exit(2)
+
+        if name.endswith(".yml") or name.endswith(".yaml") or name.endswith(".yml.txt"):
+            formatter = yaml.load
+        elif name.endswith(".json"):
+            formatter = json.load
         else:
             log.error("Only yaml or json supported")
             sys.exit(7)
-        self.upload()
 
-        pass
+        with codecs.open(name, 'r', "utf-8") as f:
+            log.debug("Reading format %s", name)
+            return formatter(f.read())
 
-    def convert(self):
-        if os.path.exists(self.translation):
-            with codecs.open(self.translation, 'r', "utf-8") as f:
-                log.debug("Converting yaml to json")
-                s = f.read()
-                data = yaml.load(s)
-                json.dump(data,  codecs.open("upload_me.json", 'w', "utf-8"), ensure_ascii=False)
-                self.data = json.dumps(data, ensure_ascii=False).encode("utf-8")
+    def collect(self, collect_path):
+        collected = []
+        for (dirpath, dirnames, filenames) in os.walk(collect_path):
+            if self.translation_name in filenames:
+                collected.append(os.path.join(dirpath, self.translation_name))
+
+        if self.data.get('app') is None:
+            self.data['app'] = {}
+
+        for file in collected:
+            data = self.read(file)
+            log.debug("Base joins %s", file)
+            self.data['app']['slots'] = deepmerge(self.data['app'].get('slots', {}), data.get('app', {}).get('slots', {}))
+
+
+    def cleanup(self):
+        resp = multipart_post("https://api.poeditor.com/v2/projects/export", {
+            "api_token": self.api_token,
+            "id": self.project_id,
+            "language": self.language,
+            "type": "json"
+        })
+
+        if resp["response"]["code"] == '200':
+            r = requests.get(resp["result"]["url"])
+            if r.status_code != 200:
+                log.error("Status code: %d", r.status_code)
+                sys.exit(7)
+
+            data = r.json()
         else:
-            log.error("File %s not exist", (self.translation,))
-            sys.exit(2)
+            log.error("Error: %s", resp["response"]["message"])
+            sys.exit(4)
 
+        cleanup_list = []
+        for term in data:
+            if nested_get(self.data, term) is None:
+                cleanup_list.append({"term": term["term"], "context": term["context"]})
+
+        if len(cleanup_list):
+            if not self.force_delete:
+                print "Terms: some term will be removed, sure?"
+                for clean in cleanup_list:
+                    print "Term: %(term)s (%(context)s)" % clean
+                r = raw_input("Press Enter to confirm or Ctrl-C to break operation")
+
+            resp = multipart_post("https://api.poeditor.com/v2/terms/delete", {
+                    "api_token": self.api_token,
+                    "id": self.project_id,
+                    "data": json.dumps(cleanup_list, ensure_ascii=False).encode("utf-8")
+                })            
+
+            if resp["response"]["code"] == '200':
+                log.info("Terms: Deleted:%(deleted)s Parsed:%(parsed)s", resp["result"]["terms"])
+            else:
+                log.error("Error: " + resp["response"]["message"])
+                sys.exit(4)
 
     def upload(self):
-        multipart_data = MultipartEncoder(
-            fields = {
-                "api_token": self.api_token,
-                "id": self.project_id,
-                "updating": "terms_translations",
-                "language": self.language,
-                "file": ("upload_me.json", open("upload_me.json", "rb"), "text/plain")
-            }
-        )
-        files = {"file": open('upload_me.json', 'rb')}
-        r = requests.post("https://api.poeditor.com/v2/projects/upload", data=multipart_data, headers={'Content-Type': multipart_data.content_type})
-        os.remove('upload_me.json')
-        resp = r.json()
-        if (resp["response"]["code"] == '200'):
-            log.info("Translation: Updated:%(updated)s Added:%(added)%s Parsed:%(parsed)s", resp["result"]["translations"])
+        data = json.dumps(self.data, ensure_ascii=False).encode("utf-8")
+        resp = multipart_post("https://api.poeditor.com/v2/projects/upload", {
+            "api_token": self.api_token,
+            "id": self.project_id,
+            "updating": "terms_translations",
+            "language": self.language,
+            "file": ("upload_me.json", StringIO(data), "text/plain")
+        })            
+
+        if resp["response"]["code"] == '200':
+            log.info("Translation: Updated:%(updated)s Added:%(added)s Parsed:%(parsed)s", resp["result"]["translations"])
             log.info("Terms: Deleted:%(deleted)s Added:%(added)s Parsed:%(parsed)s",
                      resp["result"]["terms"])
         else:

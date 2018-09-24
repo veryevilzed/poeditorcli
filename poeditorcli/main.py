@@ -21,10 +21,12 @@ def cli():
 @click.option('--api_token', default=None, help='POEditor api-token')
 @click.option('--project_id', default=None, help='POEditor Project ID')
 @click.option('--language', default='ru', help='Language')
-def upload(translation, api_token, project_id, language):
+@click.option('--collect_path', default=None, help='Path to collect parts')
+@click.option('-f', '--force_delete', default=False, is_flag=True, help='Force delete unused terms')
+def upload(translation, api_token, project_id, language, collect_path, force_delete):
     if api_token is None:
         api_token = os.environ.get('POEDITOR_API_TOKEN')
-    POEditorUpload(translation, api_token, project_id, language)
+    POEditorUpload(translation, api_token, project_id, language, collect_path, force_delete)
 
 
 @cli.command()
