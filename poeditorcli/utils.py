@@ -5,7 +5,7 @@ def deepmerge(source, destination):
     for key, value in source.items():
         if isinstance(value, dict):
             deepmerge(value, destination.setdefault(key, {}))
-        elif destination.get(key) is None:
+        elif not destination.get(key):
             destination[key] = value
     return destination
 
