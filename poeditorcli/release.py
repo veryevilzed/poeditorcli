@@ -37,7 +37,7 @@ class POEditorRelease:
             if len(language) > 1:
                 for merge_language in language[1:]:
                     data = deepmerge(self.all_langs[merge_language], data)
-            data = yaml.safe_dump(data, default_flow_style=False, allow_unicode=True)
+            data = yaml.safe_dump(data, default_flow_style=False, default_style='\"', allow_unicode=True)
             self.upload(language, data)
 
     def getLanguageList(self):

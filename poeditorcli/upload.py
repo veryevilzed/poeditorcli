@@ -1,5 +1,6 @@
 #coding:utf-8
 import codecs, requests, yaml, json, sys, os, logging
+from yaml import Loader
 from shutil import copyfile
 from StringIO import StringIO
 from utils import deepmerge, nested_get, multipart_post
@@ -8,6 +9,8 @@ log = logging.getLogger("UPLOAD")
 
 class POEditorUpload:
     def __init__(self, translation, api_token, project_id, language, collect_path, force_delete):
+        Loader.add_constructor(u'tag:yaml.org,2002:float', lambda self, node: self.construct_yaml_str(node))
+        Loader.add_constructor(u'tag:yaml.org,2002:bool', lambda self, node: self.construct_yaml_str(node))
         log.debug("file %s", translation)
         self.translation = translation
         self.translation_name = os.path.basename(translation)
@@ -102,6 +105,7 @@ class POEditorUpload:
             "api_token": self.api_token,
             "id": self.project_id,
             "updating": "terms_translations",
+            "overwrite": "1",
             "language": self.language,
             "file": ("upload_me.json", StringIO(data), "text/plain")
         })            
