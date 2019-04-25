@@ -8,7 +8,7 @@ from utils import deepmerge, nested_get, multipart_post
 log = logging.getLogger("UPLOAD")
 
 class POEditorUpload:
-    def __init__(self, translation, api_token, project_id, language, collect_path, force_delete):
+    def __init__(self, translation, api_token, project_id, language, collect_path, cleanup):
         Loader.add_constructor(u'tag:yaml.org,2002:float', lambda self, node: self.construct_yaml_str(node))
         Loader.add_constructor(u'tag:yaml.org,2002:bool', lambda self, node: self.construct_yaml_str(node))
         log.debug("file %s", translation)
@@ -17,11 +17,11 @@ class POEditorUpload:
         self.api_token = api_token
         self.project_id = project_id
         self.language = language
-        self.force_delete = force_delete
         self.data = self.read(self.translation)
         if collect_path is not None: 
             self.collect(collect_path)
-        self.cleanup()
+        if cleanup:
+            self.cleanup()
         self.upload()
 
     def read(self, name):
@@ -81,11 +81,10 @@ class POEditorUpload:
                 cleanup_list.append({"term": term["term"], "context": term["context"]})
 
         if len(cleanup_list):
-            if not self.force_delete:
-                print "Terms: some term will be removed, sure?"
-                for clean in cleanup_list:
-                    print "Term: %(term)s (%(context)s)" % clean
-                r = raw_input("Press Enter to confirm or Ctrl-C to break operation")
+            print "Terms: some term will be removed, sure?"
+            for clean in cleanup_list:
+                print "Term: %(term)s (%(context)s)" % clean
+            r = raw_input("Press Enter to confirm or Ctrl-C to break operation")
 
             resp = multipart_post("https://api.poeditor.com/v2/terms/delete", {
                     "api_token": self.api_token,

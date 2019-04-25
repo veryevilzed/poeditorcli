@@ -24,11 +24,11 @@ def cli():
 @click.option('--project_id', default=None, help='POEditor Project ID')
 @click.option('--language', default='ru', help='Language')
 @click.option('--collect_path', default=None, help='Path to collect parts')
-@click.option('-f', '--force_delete', default=False, is_flag=True, help='Force delete unused terms')
-def upload(translation, api_token, project_id, language, collect_path, force_delete):
+@click.option('--cleanup', default=False, is_flag=True, help='Force delete unused terms')
+def upload(translation, api_token, project_id, language, collect_path, cleanup):
     if api_token is None:
         api_token = os.environ.get('POEDITOR_API_TOKEN')
-    POEditorUpload(translation, api_token, project_id, language, collect_path, force_delete)
+    POEditorUpload(translation, api_token, project_id, language, collect_path, cleanup)
 
 
 @cli.command()
@@ -78,6 +78,10 @@ def release(api_token, project_id, languages, upload_url, upload_token, upload_v
     log.info("Total used languages: %s", ", ".join(languages_used))
 
     POEditorRelease(api_token, project_id, languages, languages_used, upload_url, upload_token, int(upload_version))
+
+@cli.command()
+def version():
+    print "Version: 0.8"
 
 if __name__ == '__main__':
     cli()
