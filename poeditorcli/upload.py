@@ -30,16 +30,16 @@ class POEditorUpload:
             sys.exit(2)
 
         if name.endswith(".yml") or name.endswith(".yaml") or name.endswith(".yml.txt"):
-            formatter = yaml.load
+            with codecs.open(name, 'r', "utf-8") as f:
+                log.debug("Reading format %s", name)
+                return yaml.load(f.read(), Loader=Loader)
         elif name.endswith(".json"):
-            formatter = json.load
+            with codecs.open(name, 'r', "utf-8") as f:
+                log.debug("Reading format %s", name)
+                return json.load(f.read())
         else:
             log.error("Only yaml or json supported")
             sys.exit(7)
-
-        with codecs.open(name, 'r', "utf-8") as f:
-            log.debug("Reading format %s", name)
-            return formatter(f.read())
 
     def collect(self, collect_path):
         collected = []
