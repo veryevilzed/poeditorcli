@@ -81,7 +81,7 @@ def release(api_token, project_id, languages, upload_url, upload_token, upload_v
 
 @cli.command()
 def version():
-    print "Version: 0.9"
+    print("Version: 0.10")
 
 if __name__ == '__main__':
     cli()

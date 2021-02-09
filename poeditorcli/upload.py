@@ -5,6 +5,7 @@ from shutil import copyfile
 from StringIO import StringIO
 from utils import deepmerge, nested_get, multipart_post
 
+real_raw_input = vars(__builtins__).get('raw_input',input)
 log = logging.getLogger("UPLOAD")
 
 class POEditorUpload:
@@ -81,10 +82,10 @@ class POEditorUpload:
                 cleanup_list.append({"term": term["term"], "context": term["context"]})
 
         if len(cleanup_list):
-            print "Terms: some term will be removed, sure?"
+            print("Terms: some term will be removed, sure?")
             for clean in cleanup_list:
-                print "Term: %(term)s (%(context)s)" % clean
-            r = raw_input("Press Enter to confirm or Ctrl-C to break operation")
+                print("Term: %(term)s (%(context)s)" % clean)
+            r = real_raw_input("Press Enter to confirm or Ctrl-C to break operation")
 
             resp = multipart_post("https://api.poeditor.com/v2/terms/delete", {
                     "api_token": self.api_token,
