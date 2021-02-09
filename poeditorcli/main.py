@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os, logging, click, sys
-from sets import Set
 from upload import POEditorUpload
 from update import POEditorUpdate
 from release import POEditorRelease
@@ -67,7 +66,7 @@ def release(api_token, project_id, languages, upload_url, upload_token, upload_v
     if 'http' not in upload_url:
         upload_url = 'http://%s/update/language' % upload_url
 
-    languages = map(lambda x: x.split("-"), languages.split(","))
+    languages = [x.split("-") for x in languages.split(",")]
 
     languages_used = Set()
     log.info("Languages configuration will be:")

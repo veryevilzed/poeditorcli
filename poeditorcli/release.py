@@ -12,8 +12,8 @@ log = logging.getLogger("RELEASE")
 
 class POEditorRelease:
     def __init__(self, api_token, project_id, languages, languages_used, upload, upload_token, upload_version):
-        Loader.add_constructor(u'tag:yaml.org,2002:float', lambda self, node: self.construct_yaml_str(node))
-        Loader.add_constructor(u'tag:yaml.org,2002:bool', lambda self, node: self.construct_yaml_str(node))
+        Loader.add_constructor('tag:yaml.org,2002:float', lambda self, node: self.construct_yaml_str(node))
+        Loader.add_constructor('tag:yaml.org,2002:bool', lambda self, node: self.construct_yaml_str(node))
         self.api_token = api_token
         self.project_id = project_id
         self.upload_url = upload
@@ -88,5 +88,5 @@ class POEditorRelease:
 
         resp = requests.post(self.upload_url, data=json.dumps(payload))
         if resp.status_code != 200:
-            log.error(resp.text)
-            sys.exit(2)
+           log.error(resp.text)
+           sys.exit(2)

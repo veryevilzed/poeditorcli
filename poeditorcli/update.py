@@ -11,8 +11,8 @@ log = logging.getLogger("UPDATE")
 
 class POEditorUpdate:
     def __init__(self, translation, api_token, project_id, language):
-        Loader.add_constructor(u'tag:yaml.org,2002:float', lambda self, node: self.construct_yaml_str(node))
-        Loader.add_constructor(u'tag:yaml.org,2002:bool', lambda self, node: self.construct_yaml_str(node))
+        Loader.add_constructor('tag:yaml.org,2002:float', lambda self, node: self.construct_yaml_str(node))
+        Loader.add_constructor('tag:yaml.org,2002:bool', lambda self, node: self.construct_yaml_str(node))
         log.debug("file %s", translation)
         self.translation = translation
         self.api_token = api_token

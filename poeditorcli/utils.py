@@ -2,7 +2,7 @@ import requests
 from requests_toolbelt import MultipartEncoder
 
 def deepmerge(source, destination):
-    for key, value in source.items():
+    for key, value in list(source.items()):
         if isinstance(value, dict):
             deepmerge(value, destination.setdefault(key, {}))
         elif not destination.get(key):
@@ -12,7 +12,7 @@ def deepmerge(source, destination):
 def nested_get(input_dict, nested_key):
     internal_dict_value = input_dict
     if isinstance(nested_key, dict):
-        nested_key = map(lambda x: x.strip('"'), nested_key["context"].split(".")) + [nested_key["term"]]
+        nested_key = [x.strip('"') for x in nested_key["context"].split(".")] + [nested_key["term"]]
     if not isinstance(nested_key, list) and not isinstance(nested_key, tuple):
         nested_key = nested_key.split(".")
     for k in nested_key:
