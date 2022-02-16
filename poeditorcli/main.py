@@ -73,7 +73,10 @@ def release(api_token, project_id, languages, upload_url, upload_token, upload_v
 
     languages = [x.split("-") for x in languages.split(",")]
 
-    languages_used = Set()
+    try:
+        languages_used = Set()
+    except:
+        languages_used = set()
     log.info("Languages configuration will be:")
     for lang in languages:
         log.info("\t%s", " <= ".join(lang))
