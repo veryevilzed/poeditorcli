@@ -3,7 +3,10 @@ import codecs, requests, yaml, json, sys, os, logging
 from yaml import Loader
 from shutil import copyfile
 from io import StringIO
-from utils import deepmerge, nested_get, multipart_post
+try:
+    from utils import deepmerge, nested_get, multipart_post
+except:
+    from .utils import deepmerge, nested_get, multipart_post
 
 log = logging.getLogger("UPLOAD")
 
