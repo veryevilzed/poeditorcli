@@ -103,7 +103,7 @@ class POEditorUpload:
 
     def upload(self):
         io = StringIO()
-        json.dumps(self.data, io, ensure_ascii=False)
+        json.dump(self.data, io, ensure_ascii=False)
         resp = multipart_post("https://api.poeditor.com/v2/projects/upload", {
             "api_token": self.api_token,
             "id": self.project_id,
