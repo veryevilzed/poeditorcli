@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 
 import os, logging, click, sys
-from upload import POEditorUpload
-from update import POEditorUpdate
-from release import POEditorRelease
-
+try:
+    from upload import POEditorUpload
+    from update import POEditorUpdate
+    from release import POEditorRelease
+except:
+    from .upload import POEditorUpload
+    from .update import POEditorUpdate
+    from .release import POEditorRelease
+    
 FORMAT = '%(asctime)-7s [%(name)-6s] [%(levelname)-5s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO, datefmt="%H:%M:%S")
 
