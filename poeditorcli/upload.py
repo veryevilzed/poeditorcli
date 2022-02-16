@@ -102,14 +102,15 @@ class POEditorUpload:
                 sys.exit(4)
 
     def upload(self):
-        data = json.dumps(self.data, ensure_ascii=False).encode("utf-8")
+        io = StringIO()
+        json.dumps(self.data, io, ensure_ascii=False)
         resp = multipart_post("https://api.poeditor.com/v2/projects/upload", {
             "api_token": self.api_token,
             "id": self.project_id,
             "updating": "terms_translations",
             "overwrite": "1",
             "language": self.language,
-            "file": ("upload_me.json", StringIO(data), "text/plain")
+            "file": ("upload_me.json", io, "text/plain")
         })            
 
         if resp["response"]["code"] == '200':
