@@ -6,7 +6,10 @@ from yaml import Loader
 from requests_toolbelt import MultipartEncoder
 from shutil import copyfile
 import os
-from utils import deepmerge, multipart_post
+try:
+    from utils import deepmerge, multipart_post
+except:
+    from .utils import deepmerge, multipart_post
 
 log = logging.getLogger("RELEASE")
 
