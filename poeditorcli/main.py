@@ -41,15 +41,16 @@ def upload(translation, api_token, project_id, language, collect_path, cleanup):
 @click.option('--project_id', default=None, help='POEditor Project ID')
 @click.option('--language', default=None, help='Language. if not set, load all languages. Need %s in translation name')
 @click.option('--except_language', default=None, help='Except language for `load all language`')
-def update(translation, api_token, project_id, language, except_language):
+@click.option('--ignore_empty', default=False, is_flag=True, help='Ignore terms without translation')
+def update(translation, api_token, project_id, language, except_language, ignore_empty):
     if language is None:
         if "%s" not in translation:
             log.error("Need %s for language code")
             sys.exit(9)
 
-        POEditorUpdate.getLanguageList(translation, api_token, project_id, except_language)
+        POEditorUpdate.getLanguageList(translation, api_token, project_id, except_language, ignore_empty)
     else:
-        POEditorUpdate(translation, api_token, project_id, language)
+        POEditorUpdate(translation, api_token, project_id, language, ignore_empty)
 
 
 @cli.command()
@@ -88,7 +89,7 @@ def release(api_token, project_id, languages, upload_url, upload_token, upload_v
 
 @cli.command()
 def version():
-    print("Version: 0.10")
+    print("Version: 0.17")
 
 if __name__ == '__main__':
     cli()

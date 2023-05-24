@@ -9,8 +9,18 @@ import os
 
 log = logging.getLogger("UPDATE")
 
+def clean_dict(d):
+    new_dict = {}
+    for k, v in d.items():
+        if isinstance(v, dict):
+            v = clean_dict(v)
+        if v != '' and v != {}:
+            new_dict[k] = v
+    return new_dict
+
+
 class POEditorUpdate:
-    def __init__(self, translation, api_token, project_id, language):
+    def __init__(self, translation, api_token, project_id, language, ignore_empty):
         Loader.add_constructor('tag:yaml.org,2002:float', lambda self, node: self.construct_yaml_str(node))
         Loader.add_constructor('tag:yaml.org,2002:bool', lambda self, node: self.construct_yaml_str(node))
         log.debug("file %s", translation)
@@ -18,6 +28,7 @@ class POEditorUpdate:
         self.api_token = api_token
         self.project_id = project_id
         self.language = language
+        self.ignore_empty = ignore_empty
         self.download()
 
         if self.translation.endswith(".yml") or self.translation.endswith(".yaml") or self.translation.endswith(".yml.txt"):
@@ -35,7 +46,7 @@ class POEditorUpdate:
 
 
     @staticmethod
-    def getLanguageList(translation, api_token, project_id, exlang):
+    def getLanguageList(translation, api_token, project_id, exlang, ignore_empty):
         payload = {
             "api_token": api_token,
             "id": project_id,
@@ -50,7 +61,7 @@ class POEditorUpdate:
             if lang["code"] == exlang:
                 continue
             log.info("%(name)s(%(code)s) Translate:%(percentage)d%% LastUpdate:%(updated)s", lang)
-            POEditorUpdate(translation % lang["code"], api_token, project_id, lang["code"])
+            POEditorUpdate(translation % lang["code"], api_token, project_id, lang["code"], ignore_empty)
 
 
     def download(self):
@@ -72,3 +83,5 @@ class POEditorUpdate:
             log.error("Status code: %d", r.status_code)
             sys.exit(7)
         self.data = r.json()
+        if self.ignore_empty:
+            self.data = clean_dict(self.data)
