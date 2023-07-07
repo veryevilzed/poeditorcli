@@ -38,7 +38,7 @@ class POEditorUpdate:
         elif self.translation.endswith(".json"):
             log.info("Save json")
             with codecs.open(self.translation, 'w', "utf-8") as f:
-                json.dump(self.data, f, ensure_ascii=False, encoding='utf8')
+                json.dump(self.data, f, ensure_ascii=False)
         else:
             log.error("Only yaml or json supported")
             sys.exit(7)
